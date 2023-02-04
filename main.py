@@ -1,12 +1,49 @@
 import argparse
 
+import utils
+
+import gym
+import gym_port
+from gym_port import utils as gym_utils
+
+
 def main(config):
+
+    # create environment
+    env = gym.make('port-v0', **gym_utils.get_env_args(config))
+
+    # set seeds
     
-    ...
+    # get algorithm - DDPG/PPO etc
+    algo = utils.get_algo(config, env)
+
+    # TO DO: if config["mode"] == 'train':
+    algo.train()
+
+    algo.eval()
+
+
+
 
 def get_args() -> dict:
 
     parser = argparse.ArgumentParser(description='RL Portfolio Manager')
+
+    # currently only supports ["III", "AAL", "ABDN", "ADM", "AHT", "ANTO", "AZN"]
+    # TO DO: Dynamically download stock data for input 
+    parser.add_argument("--stocks", type=list, help="List of stocks in Portfolio", default= ["III", "AAL", "ABDN", "ADM", "AHT", "ANTO", "AZN"])
+
+    # algo parameters
+    parser.add_argument("--rl_algo", type=str, help="RL Algorithm [DDPG, PPO]", default="ddpg")
+
+    # buffer parameters
+    parser.add_argument("--max_buffer_size", type=int, help="Maximum replay buffer size", default=50000)
+
+    #training parameters 
+    parser.add_argument("--total_train_steps", type=int, help="Number of training steps", default=50000)
+    parser.add_argument("--warmup_steps", type=int, help="Number of steps collection experience before learning", default=10000)
+    parser.add_argument("--collect_ratio", type=int, help="Number of collecting experience steps per learning steps", default=2)
+    parser.add_argument("--batch_size", type=int, help="Batch size for training model", default=32)
 
     args = parser.parse_args()
 
