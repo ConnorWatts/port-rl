@@ -1,5 +1,6 @@
 import argparse
-
+from algos.ddpg import DDPG
+#from algos.ppo import PPO
 import utils
 
 import gym
@@ -10,24 +11,37 @@ from gym_port import utils as gym_utils
 def main(config):
 
     # create environment
-    env = gym.make('port-v0', **gym_utils.get_env_args(config))
+    train_env = gym.make('port-v0', **gym_utils.get_env_args(config['stocks'],"Train",config['input_periods']))
+    test_env = gym.make('port-v0', **gym_utils.get_env_args(config['stocks'],"Test",config['input_periods']))
 
     # set seeds
     
     # get algorithm - DDPG/PPO etc
-    algo = utils.get_algo(config, env)
+    algo = get_algo(config, train_env, test_env)
 
-    # TO DO: if config["mode"] == 'train':
+    # TO DO: if config["mode"] == 'train': then create env
     algo.train()
 
     algo.eval()
 
+def get_algo(config,train_env, test_env):
 
+    # TO DO: tuck this away somewhere
+
+    if config["rl_algo"] == "ddpg":
+        print("--Loading DDPG Agent--")
+        return DDPG(config, train_env, test_env)
+
+    elif config["rl_algo"] == "ppo":
+        print("--Loading PPO Agent--")
+        #return PPO(config, env)
 
 
 def get_args() -> dict:
 
     parser = argparse.ArgumentParser(description='RL Portfolio Manager')
+
+    parser.add_argument("--mode", type=str, help="Mode of experiment [Train,Test]", default="Train")
 
     # currently only supports ["III", "AAL", "ABDN", "ADM", "AHT", "ANTO", "AZN"]
     # TO DO: Dynamically download stock data for input 
@@ -44,6 +58,8 @@ def get_args() -> dict:
     parser.add_argument("--warmup_steps", type=int, help="Number of steps collection experience before learning", default=10000)
     parser.add_argument("--collect_ratio", type=int, help="Number of collecting experience steps per learning steps", default=2)
     parser.add_argument("--batch_size", type=int, help="Batch size for training model", default=32)
+    parser.add_argument("--learning-rate", type=float, default=3e-4,help="the learning rate of the optimizer")
+    parser.add_argument("--input_periods", type=int, help="Number of input periods", default=20)
 
     args = parser.parse_args()
 

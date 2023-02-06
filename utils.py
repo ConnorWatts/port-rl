@@ -1,12 +1,29 @@
-from algos.ddpg import DDPG
-from algos.ppo import PPO
+from networks.critic import Critic
+from networks.actor import Actor
+import torch
 
-def get_algo(config,env):
+# getters
 
-    if config["rl_algo"] == "ddpg":
-        print("--Loading DDPG Agent--")
-        return DDPG(config, env)
+def get_actor(config):
+    # TO DO:
+    # pass in device
+    # Actor(envs).to(device)
+    return Actor(config)
 
-    elif config["rl_algo"] == "ppo":
-        print("--Loading PPO Agent--")
-        return PPO(config, env)
+def get_critic(config):
+    # TO DO:
+    return Critic(config)
+
+def get_actor_noise(config: dict, device):
+
+    dim = len(config['stocks'])
+    dist = config['actor_noise_dist']
+
+    if dist =='gaussian':
+        loc = torch.zeros(dim).to(device)
+        scale = torch.ones(dim).to(device)
+        normal = torch.distributions.normal.Normal(loc, scale)
+        return torch.distributions.independent.Independent(normal,1)
+    elif dist =='uniform':
+        return torch.distributions.Uniform(torch.zeros(dim).to(device),torch.ones(dim).to(device))
+
