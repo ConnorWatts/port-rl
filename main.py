@@ -10,27 +10,28 @@ from gym_port import utils as gym_utils
 
 def main(config):
 
-    # create environment
-    train_env = gym.make('port-v0', **gym_utils.get_env_args(config['stocks'],"Train",config['input_periods']))
-    test_env = gym.make('port-v0', **gym_utils.get_env_args(config['stocks'],"Test",config['input_periods']))
-
     # set seeds
     
+    # create environment
+    env = gym.make('port-v0', **gym_utils.get_env_args(config['stocks'],config['mode'],config['input_periods']))
+    
     # get algorithm - DDPG/PPO etc
-    algo = get_algo(config, train_env, test_env)
+    algo = get_algo(config, env)
 
-    # TO DO: if config["mode"] == 'train': then create env
-    algo.train()
+    # run experiment
+    if config['mode'] == 'Train':
+        algo.train()
 
-    algo.eval()
+    elif config['mode'] == 'Test':
+        algo.eval()
 
-def get_algo(config,train_env, test_env):
+def get_algo(config,env):
 
     # TO DO: tuck this away somewhere
 
     if config["rl_algo"] == "ddpg":
         print("--Loading DDPG Agent--")
-        return DDPG(config, train_env, test_env)
+        return DDPG(config, env)
 
     elif config["rl_algo"] == "ppo":
         print("--Loading PPO Agent--")

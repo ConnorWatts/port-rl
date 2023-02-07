@@ -1,8 +1,9 @@
 from networks.critic import Critic
 from networks.actor import Actor
+import torch.nn.functional as F
 import torch
 
-# getters
+#### getters
 
 def get_actor(config):
     # TO DO:
@@ -14,7 +15,13 @@ def get_critic(config):
     # TO DO:
     return Critic(config)
 
+def get_loss(config):
+    # TO DO:
+    return F.mse_loss()
+
 def get_actor_noise(config: dict, device):
+
+    # TO DO: allow variation
 
     dim = len(config['stocks'])
     dist = config['actor_noise_dist']

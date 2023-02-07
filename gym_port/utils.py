@@ -25,6 +25,7 @@ def get_price_tensors(stocks: int, mode: str, input_periods: int) -> pd.DataFram
             array.append(close_norm)
             array.append(high_norm)
             array.append(low_norm)
+
             array_.append(array)
 
         out.append(array_)
@@ -45,7 +46,7 @@ def get_return_tensors(stocks: list, mode: str, input_periods: int) -> pd.DataFr
         data = data.iloc[input_periods-2 : ] 
         data.set_index('Date', inplace=True)
         returns[stock] = data['Close'].div(data['Close'].shift(1))
-    return returns.dropna().to_numpy()
+        return returns.dropna().to_numpy()
 
 
 def get_env_args(stocks: list, mode: str, input_periods: int) -> Dict[str, pd.DataFrame]:
